@@ -1,7 +1,7 @@
 Winter 2024 CSI 4107 Group 7 Assignments
 
 Samy Touabi | 300184721
-Jackie Chen | ADD_STUDENT_NUMBER
+Jackie Chen | 300165909
 Kian Zahrai | 300098986
 
 Submission instructions:
