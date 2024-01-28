@@ -44,7 +44,7 @@ def tokenizeDoc(text):
     modifiedtokens=[]
 
     for word in umodifiedtokens:
-        if word in stopwords or word == "":
+        if word in stopwords or word == "" or word.isnumeric(): # isnumeric will only continue if the word is an integer
             continue
         else: 
             modifiedtokens.append(word)
@@ -83,7 +83,8 @@ def processFile(filepath):
                 case _ :
                     continue
                                           
-
+# a token is a word that is not a common word (like the, a, of...)
+# The tokens in the phrase "The dog is red" are "dog" and "red"
 def processCorpus():
     with os.scandir('coll/') as entries: 
         for entry in entries:
