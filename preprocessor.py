@@ -10,8 +10,6 @@ import os
 import string
 
 
-#make hash table <doc name, bag of words>
-documentdictionary = {}
 
 #make set of stop words from reading stop word file 
 def getStopWords():
@@ -24,42 +22,42 @@ def getStopWords():
         stopwords.add(line.strip())
     return stopwords
 
-stopwords = getStopWords()
 
 def getDocumentName(line):
     return line[(line.index(">")+1):line.index("<",1)].strip()
 
 def getTag(line):
     try:
-        if line.index("<") == 0:
-            return line[(line.index("<")+1): line.index(">",1)]
+        if line.index(">") > line.index("<"):
+            return line[(line.index("<")+1): line.index(">")]
     except ValueError:
         return 'NA'
     
 def tokenizeDoc(text):
-    modifiedpunctuation = string.punctuation.replace("-","")
-    lowercase = text.lower()
-    nopunctuation = lowercase.translate(str.maketrans('', '', modifiedpunctuation))
-    umodifiedtokens = nopunctuation.split(" ")
+    #modifiedpunctuation = string.punctuation.replace("-","")
+    lowercase = text.lower().replace("-", " ")
+    nopunctuation = lowercase.translate(str.maketrans(string.punctuation, ' '*len(string.punctuation)))
+    unmodifiedtokens = nopunctuation.split()
     modifiedtokens=[]
 
-    for word in umodifiedtokens:
-        if word in stopwords or word == "" or word.isnumeric(): # isnumeric will only continue if the word is an integer
+
+    for word in unmodifiedtokens:
+        if word in stopwords or word == "" or not word.isalpha(): # isnumeric will only continue if the word is an  positive integer
             continue
         else: 
             modifiedtokens.append(word)
     
-    #stemm 
             
     return modifiedtokens
 
-def processFile(filepath):
+def processFile(filepath,documentdictionary,vocabset):
 
-    with open(filepath) as file:
+    with open(filepath) as file: #with automatically closes the file/directory
 
         documentname=""
         documentrawtext = ""
         documenttokens=[]
+        textflag = False
 
         for line in file:
             tag = getTag(line)
@@ -71,13 +69,23 @@ def processFile(filepath):
                 case "/DOC": 
                     documenttokens=tokenizeDoc(documentrawtext)
                     documentdictionary.update({documentname: documenttokens.copy()})
+                    vocabset.update(set(documenttokens.copy()))
 
                     documentname, documentrawtext = "", ""
                     documenttokens.clear()
                     continue 
-                        
+
+                case "TEXT":
+                    textflag = True
+                    continue
+                
+                case "/TEXT":
+                    textflag = False
+                    continue 
+
                 case "NA":
-                    documentrawtext += line.replace("\n", " ")
+                    if(textflag == True):
+                        documentrawtext += " "+ line.strip()
                     continue
 
                 case _ :
@@ -85,9 +93,32 @@ def processFile(filepath):
                                           
 # a token is a word that is not a common word (like the, a, of...)
 # The tokens in the phrase "The dog is red" are "dog" and "red"
-def processCorpus():
+def processCorpus(documentdictionary,vocabset): #documentdictionary being an empty dicitonary 
     with os.scandir('coll/') as entries: 
+        
         for entry in entries:
-            processFile(entry)
+            processFile(entry,documentdictionary,vocabset)
+        
+        
 
 
+
+
+#main 
+stopwords = getStopWords()
+documentdictonary = {}
+vocabset = set()
+
+'''
+processFile("testing_files/textdoc.txt",documentdictonary,vocabset)
+print(vocabset)
+
+
+
+processCorpus(documentdictonary,vocabset)
+print(len(vocabset))
+file = open("vocab.txt","w")
+for word in vocabset:
+    file.write(word+"\n")
+file.close()
+'''
