@@ -12,43 +12,46 @@ read json to get index as an object
 '''
 
 import preprocessor
+import json
 
 def initializeIndex(index,vocabset):
     for token in vocabset: 
-        index.update({token:[]}) 
+        index.update({token:{}}) 
 
 def populateIndex(index,documentdictionary):
+    count = 0
     for key in documentdictonary.keys(): #iterate through index
         for token in documentdictionary.get(key): #iterate through bag of words of each doc
             if token in index: 
-                if len(index.get(token)) == 0:
-                    index.get(key).append((key,1))
+                if key in index.get(token):
+                    index.get(token).update({key: (index.get(token)[key]) + 1})
                 else:
-                    for docs in index.get(token):
-                        if token in docs: # if document already is in inverted index term list 
-                            termfrequency = docs[1]
-                            index.get(key).remove((key,termfrequency))
-                            index.get(key).append((key,termfrequency+1))
-                        else: #if document isnt already in inverted index term list 
-                            index.get(key).append((key,1))
+                    index.get(token).update({key: 1})
+    
+
+
+def storeHash(index):
+    with open("invertedindex.json","w") as file:
+        json.dump(index, file)
+
+def retrieveHash(filename):
+    try: 
+        index={}
+        with open(filename,"r") as file:
+            index = json.load(file)
+        return index
+    except FileNotFoundError:
+        print("Index File has not been created yet")
 
 #main
-stopwords = preprocessor.getStopWords()
-documentdictonary = {}
-vocabset = set()
+stopwords = preprocessor.getWords("testing_files/stopwords.txt")
+documentdictonary = retrieveHash("testing_files/documentbag.json")
+vocab = preprocessor.getWords("testing_files/vocab.txt")
 index = {}
 
-'''
-processFile("testing_files/textdoc.txt",documentdictonary,vocabset)
-print(vocabset)
-'''
-
-
-preprocessor.processFile("testing_files/textdoc.txt",documentdictonary,vocabset)
-print(len(documentdictonary.get("AP880731-0079")))
-print(len(vocabset))
-initializeIndex(index,vocabset)
-print(len(index.keys()))
-print()
+initializeIndex(index,vocab)
+print("empty index")
 populateIndex(index,documentdictonary)
-    
+print("done making index")
+storeHash(index)
+

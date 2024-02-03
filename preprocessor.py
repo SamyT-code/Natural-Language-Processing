@@ -8,12 +8,14 @@
 
 import os
 import string
+import porter_stemmer
+import json
 
 
 
 #make set of stop words from reading stop word file 
-def getStopWords():
-    file = open('testing_files/stopwords.txt','r')
+def getWords(filename):
+    file = open(filename,'r')
     stopwords = set()
     while True: 
         line=file.readline()
@@ -38,17 +40,20 @@ def tokenizeDoc(text):
     lowercase = text.lower().replace("-", " ")
     nopunctuation = lowercase.translate(str.maketrans(string.punctuation, ' '*len(string.punctuation)))
     unmodifiedtokens = nopunctuation.split()
-    modifiedtokens=[]
+    porter = porter_stemmer.PorterStemmer()
+    stemmedtokens=[]
 
 
     for word in unmodifiedtokens:
         if word in stopwords or word == "" or not word.isalpha(): # isnumeric will only continue if the word is an  positive integer
             continue
         else: 
-            modifiedtokens.append(word)
+            stemmedword = porter.stem(word, 0,len(word)-1)
+            stemmedtokens.append(stemmedword)
+    
     
             
-    return modifiedtokens
+    return stemmedtokens
 
 def processFile(filepath,documentdictionary,vocabset):
 
@@ -105,15 +110,14 @@ def processCorpus(documentdictionary,vocabset): #documentdictionary being an emp
 
 
 #main 
-stopwords = getStopWords()
+
+'''
+stopwords = getWords("testing_files/stopwords.txt")
 documentdictonary = {}
 vocabset = set()
 
-'''
 processFile("testing_files/textdoc.txt",documentdictonary,vocabset)
 print(vocabset)
-
-
 
 processCorpus(documentdictonary,vocabset)
 print(len(vocabset))
@@ -121,4 +125,8 @@ file = open("vocab.txt","w")
 for word in vocabset:
     file.write(word+"\n")
 file.close()
+
+file2 = open("documentbag.json", "w")
+json.dump(documentdictonary, file2)
+file2.close()
 '''
