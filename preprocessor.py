@@ -16,13 +16,13 @@ import json
 #make set of stop words from reading stop word file 
 def getWords(filename):
     file = open(filename,'r')
-    stopwords = set()
+    words = set()
     while True: 
         line=file.readline()
         if not line:
             break
-        stopwords.add(line.strip())
-    return stopwords
+        words.add(line.strip())
+    return words
 
 
 def getDocumentName(line):
@@ -35,7 +35,7 @@ def getTag(line):
     except ValueError:
         return 'NA'
     
-def tokenizeDoc(text):
+def tokenizeDoc(text,stopwords): # fix tomoorw
     #modifiedpunctuation = string.punctuation.replace("-","")
     lowercase = text.lower().replace("-", " ")
     nopunctuation = lowercase.translate(str.maketrans(string.punctuation, ' '*len(string.punctuation)))
@@ -55,7 +55,7 @@ def tokenizeDoc(text):
             
     return stemmedtokens
 
-def processFile(filepath,documentdictionary,vocabset):
+def processFile(filepath,documentdictionary,vocabset,stopwords):
 
     with open(filepath) as file: #with automatically closes the file/directory
 
@@ -98,11 +98,11 @@ def processFile(filepath,documentdictionary,vocabset):
                                           
 # a token is a word that is not a common word (like the, a, of...)
 # The tokens in the phrase "The dog is red" are "dog" and "red"
-def processCorpus(documentdictionary,vocabset): #documentdictionary being an empty dicitonary 
+def processCorpus(documentdictionary,vocabset,stopwords): #documentdictionary being an empty dicitonary 
     with os.scandir('coll/') as entries: 
         
         for entry in entries:
-            processFile(entry,documentdictionary,vocabset)
+            processFile(entry,documentdictionary,vocabset,stopwords)
         
         
 

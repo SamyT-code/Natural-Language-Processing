@@ -38,8 +38,3 @@ class Vocabvector:
     def cosineSimilarity(cls,vocabvector1, vocabvector2):
         return (np.dot(vocabvector1.vector,vocabvector2.vector))/ (vocabvector1.getMaginitude() * vocabvector2.getMaginitude())
 
-
-# <dolli, kreb , tulia> == <0,0,0> 
-#queyr vector = <1,1,1> 
-#doc vector < 0, 0, (1 ( log2( 79k)))> 
-            
