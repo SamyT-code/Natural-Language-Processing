@@ -72,7 +72,7 @@ def processFile(filepath,documentdictionary,vocabset,stopwords):
                     continue
                 
                 case "/DOC": 
-                    documenttokens=tokenizeDoc(documentrawtext)
+                    documenttokens=tokenizeDoc(documentrawtext, stopwords)
                     documentdictionary.update({documentname: documenttokens.copy()})
                     vocabset.update(set(documenttokens.copy()))
 

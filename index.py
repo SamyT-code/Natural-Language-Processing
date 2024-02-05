@@ -49,9 +49,9 @@ documentdictonary = retrieveHash("testing_files/documentbag.json")
 vocab = preprocessor.getWords("testing_files/vocab.txt")
 index = {}
 
-initializeIndex(index,vocab)
-print("empty index")
-populateIndex(index,documentdictonary)
-print("done making index")
-storeHash(index)
+# initializeIndex(index,vocab)
+# print("empty index")
+# populateIndex(index,documentdictonary)
+# print("done making index")
+# storeHash(index)
 

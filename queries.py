@@ -58,15 +58,15 @@ queries = read_queries(file_path)
 # Create a hash table with the queries
 hash_table = create_hash_table(queries)
 
-# Accessing an example query from the hash table (e.g., Query with num=2)
-example_query_num = 1
-example_query = hash_table.get(example_query_num)
+# # Accessing an example query from the hash table (e.g., Query with num=2)
+# example_query_num = 1
+# example_query = hash_table.get(example_query_num)
 
-# Printing the information of the example query
-if example_query:
-    print(f"EXAMPLE QUERY {example_query.num}: \n")
-    print(f"Title: {example_query.title} \n")
-    print(f"Description: {example_query.desc} \n")
-    print(f"Narrative: {example_query.narr} \n")
-else:
-    print(f"Query with number {example_query_num} not found.")
+# # Printing the information of the example query
+# if example_query:
+#     print(f"EXAMPLE QUERY {example_query.num}: \n")
+#     print(f"Title: {example_query.title} \n")
+#     print(f"Description: {example_query.desc} \n")
+#     print(f"Narrative: {example_query.narr} \n")
+# else:
+#     print(f"Query with number {example_query_num} not found.")
