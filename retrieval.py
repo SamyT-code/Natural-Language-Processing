@@ -30,26 +30,29 @@ turn the docs from list A to queryvectors
 step 4
 compute similairty between docvector and query vector and sort the result
 
-->make a max heap using python heap ( built in library) 
+->make a max heap using python heapq ( built in library) 
 -> interate through doc vectors
     -> run vocabvector.cosinesimilairty(queryvector,doc vectors)
     -> add {docname: reulst of cosinesimilairty } into the heap
 -> once all docs similarity computed, pop the first 1000 results into a text file 
 '''
 
-# Import the queries module from queries.py
-import queries
-
-# Import necessary functions from preprocessor.py
-from preprocessor import tokenizeDoc
-from preprocessor import getWords
-
-# Import the retrieveHash function from index.py
+# Import modules
+from queries import Query
+from preprocessor import tokenizeDoc, getWords
+from vocabvector import Vocabvector
 from index import retrieveHash
 
-# Read queries from queries.txt
-queries_data = queries.read_queries('queries.txt')
+# Initialize objects 
+queries_data = Query.read_queries('queries.txt')
+stopwords = getWords("testing_files/stopwords.txt")
+index = retrieveHash("testing_files/invertedindex.json")
+documentbag = retrieveHash("testing_files/documentbag.json")
 
+
+
+
+'''
 # Initialize Bigtext as an empty string
 Bigtext = ""
 
@@ -62,6 +65,7 @@ for query in queries_data:
 
 # Print or use Bigtext as needed
 # print(Bigtext)
+'''
 
 def runQuery(querynumber):
     # Split Bigtext into individual queries using blank lines as separators
@@ -80,13 +84,57 @@ def runQuery(querynumber):
 
 # # Example usage:
 # query_number = 10  # Replace with the desired query number
-# runQuery(query_number)
 
-stopwords = getWords("testing_files/stopwords.txt")
-
+'''
 # Tokenize the Bigtext using Tokenizedoc
 document_tokens = tokenizeDoc(Bigtext, stopwords)
+'''
 
+#querytype: 0 = title , 1 = title + doc
+def  prepareQueryVector(querynumber, querytype,querylist):
+    query = querylist.get(querynumber)
+    if query == None:
+        print("Query number does not exist")
+        exit()
+    else:
+        text = ""
+        match querytype:
+            case 0:
+                text = query.title
+            case 1:
+                text = query.title + " " + query.desc
+            case _:
+                print("Invalid querytype")
+
+        tokens = tokenizeDoc(text,stopwords)
+        Vocabvector.setWords(list(set(tokens)))
+        queryvector = Vocabvector()
+
+        for token in tokens:
+            queryvector.setVectorValue(token, queryvector.vector[Vocabvector.words.index(token)]+1)
+
+        return queryvector
+
+def getPotentialDocuments(querytokens,index):
+    potentialdocuments = set()
+    for token in querytokens:
+        if index.get(token) != None:
+            potentialdocuments.update(set(index.get(token).keys()))
+    return potentialdocuments
+
+def getDocumentvector(querytokens,index,document):
+    documentqueryvector= Vocabvector()
+    for token in querytokens:
+        if index.get(token) != None:
+            if document in index.get(token):
+
+        
+    
+#main 
+queryvector = prepareQueryVector(50,0,queries_data)
+potentialdocuments = getPotentialDocuments(Vocabvector.words,index)
+
+'''
 # Create List B (contains all tokens)
 ListB = document_tokens
 
@@ -94,7 +142,7 @@ ListB = document_tokens
 ListA = list(set(ListB))
 
 # Create a VocabVector object and set its words
-from vocabvector import Vocabvector  # Import the VocabVector class from the appropriate module
+
 # from vocabvector import calculateTfidfWeight
 vocab_vector = Vocabvector()
 vocab_vector.setWords(ListA)
@@ -107,8 +155,6 @@ for token in ListB:
 # Now, queryvector contains the vector values for List B tokens
 
 # Step 2: Get documents containing at least 1 word from List A
-# Load the index using retrieveHash from index.py
-index = retrieveHash("testing_files/invertedindex.json")
 
 # Create a set to store documents to be looked through (set A)
 setA = set()
@@ -124,9 +170,6 @@ for token in ListA:
 # Step 3: Turn the docs from List A into queryvectors
 # Create a hash map with key = doc name, value = vocabvector (call it Doc vectors)
 DocVectors = {}
-
-# Load the documentbag using retrieveHash from index.py
-documentbag = retrieveHash("testing_files/documentbag.json")
 
 # Calculate document frequency (df) for each token in ListA
 token_df = {}
@@ -176,3 +219,4 @@ with open('top_1000_results.txt', 'w') as file:
         file.write(f'Document: {doc_name}, Similarity: {similarity}\n')
 
 # Now, the top 1000 results sorted by similarity are stored in 'top_1000_results.txt'
+'''
