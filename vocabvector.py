@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import decimal
 
 class Vocabvector:
     words = []
@@ -8,11 +9,8 @@ class Vocabvector:
     def setWords(cls, list): 
         cls.words = list.copy()
     
-    def __init__(self, initial_list=None):
-        if initial_list is None:
-            self.vector = np.array([0 for _ in range(len(Vocabvector.words))])
-        else:
-            self.vector = np.array(initial_list)
+    def __init__(self):
+        self.vector = np.array([0 for _ in range(len(Vocabvector.words))], dtype=float)
 
     def setVectorValue(self, word, value):
         try:
@@ -25,7 +23,7 @@ class Vocabvector:
 
     @classmethod
     def calculateTfidfWeight(cls, tf, n, df): 
-        return tf * np.log2(n/df)
+        return decimal.Decimal(tf * np.log(n/df))
     
     @classmethod
     def cosineSimilarity(cls, vocabvector1, vocabvector2):
