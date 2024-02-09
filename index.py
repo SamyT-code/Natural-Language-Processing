@@ -11,27 +11,35 @@ store index as a json
 read json to get index as an object 
 '''
 
-import preprocessor
 import json
+import os 
+from preprocessor import getWords
+from collections import Counter
 
-def initializeIndex(index,vocabset):
+def makeIndex(vocabset,documentdictionary):
+    index = {}
+    maxfrequency = {}
+
     for token in vocabset: 
         index.update({token:{}}) 
 
-def populateIndex(index,documentdictionary):
-    count = 0
-    for key in documentdictonary.keys(): #iterate through index
-        for token in documentdictionary.get(key): #iterate through bag of words of each doc
-            if token in index: 
-                if key in index.get(token):
-                    index.get(token).update({key: (index.get(token)[key]) + 1})
-                else:
-                    index.get(token).update({key: 1})
+    for document in documentdictionary: #iterate through documents 
+        if not documentdictionary.get(document):
+            print(document)
+            continue
+        else:
+            organizedtokens = Counter(documentdictionary.get(document))
+            maxfrequency.update({document: organizedtokens.most_common(1)[0][1]})
+            for token in organizedtokens: #iterate through bag of words of each doc
+                if token in index: 
+                    index.get(token).update({document: organizedtokens[token]})
+                    #print(index.get(token))
+            
+    return index, maxfrequency
+
     
-
-
-def storeHash(index):
-    with open("invertedindex.json","w") as file:
+def storeHash(index, name):
+    with open(name,"w") as file:
         json.dump(index, file)
 
 def retrieveHash(filename):
@@ -44,14 +52,14 @@ def retrieveHash(filename):
         print("Index File has not been created yet")
 
 #main
-stopwords = preprocessor.getWords("testing_files/stopwords.txt")
-documentdictonary = retrieveHash("testing_files/documentbag.json")
-vocab = preprocessor.getWords("testing_files/vocab.txt")
-index = {}
 
-# initializeIndex(index,vocab)
-# print("empty index")
-# populateIndex(index,documentdictonary)
-# print("done making index")
-# storeHash(index)
+'''
+vocabset=getWords("testing_files/vocab.txt")
+documentdictionary=retrieveHash("testing_files/documentbag3.json")
+stopwords = getWords("testing_files/stopwords.txt")
 
+index, maxfrequency = makeIndex(vocabset,documentdictionary)
+
+storeHash(index,"testing_files/invertedindex3.json")
+storeHash(maxfrequency,"testing_files/maxfrequency.json")
+'''
