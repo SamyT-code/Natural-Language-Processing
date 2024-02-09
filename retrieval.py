@@ -1,12 +1,11 @@
 
 # Import modules
-from index import retrieveHash
-from queries import Query
 from preprocessor import removeUnwanted, stemTokens, getWords
 from heapq import heappop,heappush,heapify
 from collections import Counter
 import math
 
+#returns a list  top 1000 results of a query 
 def runQuery(querynumber, querytype, querylist, stopwords, index,maxfrequencydict):
     queryvector, querytokens= prepareQueryVector(querynumber, querytype,querylist, stopwords, index)
     potentialdocuments = getPotentialDocuments(querytokens,index)
@@ -21,19 +20,17 @@ def getDocumentFrequency(token, index):
 
 
 def getInvertedDocumentFrequency(token,index): 
-    
-    if getDocumentFrequency(token,index) == 0:
-        return 0
-    else:
-        return math.log2(79923/(getDocumentFrequency(token,index)))
+    #we add 1 to document frequency to avoid dividing by zero 
+    return math.log2(79923/((getDocumentFrequency(token,index))+1))
 
+#returns a dictionary with token and its tf-idf weight representing the query vector
 def makeQueryVector(tokens,index):
     organizedtokens = Counter(tokens)
     maxfrequency = organizedtokens.most_common(1)[0][1]
 
-    
     for token in organizedtokens:
-        tf = organizedtokens[token]/maxfrequency
+        #double normalization of term frequency
+        tf = 0.5+ (0.5 *(organizedtokens[token])/maxfrequency)
         idf =getInvertedDocumentFrequency(token,index)
         organizedtokens[token] = tf*idf
     
@@ -45,20 +42,26 @@ def makeDocumentVector(tokens,document,index,maxfrequencydict):
 
     for token in tokens:
         tf = 0
+
+        #check if tokens of query is in the index
         if index.get(token) != None:
+            #check if the document contains the token of query 
             if index.get(token).get(document) != None:
-                tf = index.get(token).get(document) / maxfrequency
+                 #double normalization of term frequency
+                tf = 0.5 + (0.5 * (index.get(token).get(document))/ maxfrequency)
         idf =getInvertedDocumentFrequency(token,index)
         organizedtokens[token] = tf * idf
     
     return organizedtokens
 
+#vector1 and vector2 are dictionaries that represent query and document vector
 def dotProduct(vector1, vector2, tokens):
     sum = 0
     for token in tokens:
         sum += (vector1.get(token) * vector2.get(token))
     return sum
 
+#Vector is a dictionary representing a vector
 def vectorMagnitude(vector):
     sum = 0
     for entries in vector:
@@ -81,15 +84,19 @@ def  prepareQueryVector(querynumber, querytype,querylist, stopwords, index,):
             case _:
                 print("Invalid querytype")
 
+        #processing and stemming the text in query 
         unstemmedquerytokens = removeUnwanted(text, stopwords)
         stemmedquerytokens = stemTokens(unstemmedquerytokens)
 
+        #set of tokens in query (removing repeats)
         querysettokens = list(set(stemmedquerytokens))
 
         queryvector = makeQueryVector(stemmedquerytokens,index)
         
         return queryvector, querysettokens
 
+#given a list of tokens of the query
+#returns all the documents name that contain at least one token within the list of tokens
 def getPotentialDocuments(querytokens,index):
     potentialdocuments = set()
     for token in querytokens:
@@ -103,25 +110,26 @@ def getCosineSimilarity(vector1,vector2,tokens):
 
     return numerator / denominator
 
+
 def getRankedDocuments(queryvector,potentialdocuments,querytokens,index,maxfrequencydict):
+    #use a max heap to sort the cosine similarty
     heap=[]
-    docvectors = {}
     for document in potentialdocuments:
         documentvector = makeDocumentVector(querytokens,document,index,maxfrequencydict)
-        docvectors.update({document: documentvector})
         similairty = getCosineSimilarity(queryvector,documentvector,querytokens)
+        #multiply similarity by -1 as heapq implements a min heap 
         heappush(heap, (similairty * -1 , document))
     
     topresults = []
     for _ in range(1000):
         try:
             tuple = heappop(heap)
+            #similarity by -1 to reverse the negation when being pushed into the heap
             correctedtuple = (tuple[0]* -1, tuple[1])
             topresults.append(correctedtuple)
         except IndexError:
             break
     return topresults
-    #return topresults,querytokens,queryvector, docvectors
 
 
 #main
