@@ -19,7 +19,6 @@ def makeIndex(vocabset,documentdictionary):
     for document in documentdictionary: 
         #skip documents that have no text in text tag or head tag
         if not documentdictionary.get(document):
-            print(document)
             continue
 
         else:
@@ -53,14 +52,3 @@ def retrieveHash(filename):
         print("Index File has not been created yet")
 
 #main
-
-'''
-vocabset=getWords("testing_files/vocab.txt")
-documentdictionary=retrieveHash("testing_files/documentbag3.json")
-stopwords = getWords("testing_files/stopwords.txt")
-
-index, maxfrequency = makeIndex(vocabset,documentdictionary)
-
-storeHash(index,"testing_files/invertedindex3.json")
-storeHash(maxfrequency,"testing_files/maxfrequency.json")
-'''

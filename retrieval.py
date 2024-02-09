@@ -134,15 +134,6 @@ def getRankedDocuments(queryvector,potentialdocuments,querytokens,index,maxfrequ
 
 #main
 
-'''
-queries_data = Query.read_queries("testing_files/queries.txt")
-stopwords=getWords("testing_files/stopwords.txt")
-index = retrieveHash("testing_files/invertedindex3.json")
-maxfrequencydict = retrieveHash("testing_files/maxfrequency.json")
-
-prepareQueryVector(50,0,queries_data,stopwords,index)
-'''
-
 
 
 

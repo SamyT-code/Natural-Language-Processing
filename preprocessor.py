@@ -102,21 +102,4 @@ def processCorpus(documentdictionary,vocabset,stopwords):
 
 #main 
 
-'''
-stopwords = getWords("testing_files/stopwords.txt")
-documentdictonary = {}
-vocabset = set()
 
-
-processCorpus(documentdictonary,vocabset,stopwords)
-print(len(vocabset))
-print(len(documentdictonary))
-file = open("testing_files/vocab.txt","w")
-for word in vocabset:
-    file.write(word+"\n")
-file.close()
-
-file2 = open("testing_files/documentbag3.json", "w")
-json.dump(documentdictonary, file2)
-file2.close()
-'''
