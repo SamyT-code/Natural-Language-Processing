@@ -23,12 +23,15 @@ py -3 -m pip install nltk
 
 #### Program Execution
 ---
-To execute the program, run the following command (can use `py` or `python` as the launcher option):
+To execute the program, download the assignment zip folder, unzip the folder and open the unzipped file where ever you unzipped it. Open a Terminal (on Linux or Mac) ot Command Prompt (windows) within the unzipped assignment folder. Run the following command (can use `py` or `python` as the launcher option) in Terminal/Command Prompt:
 ```bash
 python main.py
 ```
 
 To change the mode of testing the queries (titles only or titles + description), change the value of `mode` in `main.py`: `0` --> query on titles, `1` --> query on title + description
+
+Currently main.py will load in the invertedindex.json file to do help with retrieval. If you would like the index to be remade, delete all files in the hleper folder and run the 
+python main.py within a Terminal/Command Prompt within the assignment folder. This will take significantly longer.
 
 ## Program Functionalities
 ---
@@ -65,7 +68,7 @@ Responsible for preparing the documents and queries for the Information Retrieva
 
 - **Word Set Initialization (`getWords`)**: Reads a file (e.g., containing stop words) line by line to initialize a set of words, which is crucial for filtering out stop words during preprocessing.
 - **Read File (`readFile`)**: Reads the entire content of a file as a single block of text, facilitating the preprocessing of document and query texts.
-- **Remove Punctuation and Lowercasing (`removePunctuation`)**: Cleans the text by removing punctuation and converting it to lowercase, standardizing the text for further processing.
+- **Remove Punctuation and Lowercasing (`removePunctuation`)**: Cleans the text by removing punctuation, converting words to lowercase, removing digits and standardizing the text for further processing.
 - **Tokenization and Stop word Removal (`tokenizeAndRemoveStopWords`)**: Splits the text into tokens (words) and removes stop words, using the list initialized by `getWords`.
 - **Stemming (`stemTokens`)**: Applies stemming to the tokens to reduce them to their root form, aiding in the normalization of the text for indexing and retrieval.
 	- Leverages the `nltk` library for stemming by combining basic text manipulation techniques with natural language processing tools to prepare text data effectively for IR tasks.
@@ -82,7 +85,7 @@ Managing the creation of the inverted index (mapping terms to documents), a crit
 Converting queries and documents into vectors based on the vector space model, to then implement the retrieval and ranking mechanism. Key functionalities include:
 
 - **Query Processing (`runQuery`)**: Processes each query, preparing a query vector and identifying potential documents for retrieval based on the query terms present in the inverted index.
-- **Document Ranking (`getRankedDocuments`)**: Ranks the potential documents based on their cosine similarity to the query vector, selecting the top results for output.
+- **Document Ranking (`getRankedDocuments`)**: Ranks the potential documents based on their cosine similarity to the query vector, selecting the top 1000 results for output.
 
 
 ##### `queries.py`
