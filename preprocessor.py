@@ -1,20 +1,12 @@
-# Step1. [10 points]  
-# Preprocessing:  Implement preprocessing functions for tokenization and stopword removal. 
-#                 The index terms will be all the words left after filtering out markup that is not part of 
-#                 the text, punctuation tokens, numbers, stopwords, etc. Optionally, you can use the Porter stemmer 
-#                 to stem the index words. 
-# • Input: Documents that are read one by one from the collection
-# • Output: Tokens to be added to the index (vocabulary)
 
+#need to install nltk for this assignment 
 import os
 import string
-import porter_stemmer
-import json
+from nltk.stem import PorterStemmer
+import re
 
-
-
-#make set of stop words from reading stop word file 
-def getWords(filename):
+#initializes a set by reading a text file line by line
+def getWords(filename): 
     file = open(filename,'r')
     words = set()
     while True: 
@@ -24,86 +16,85 @@ def getWords(filename):
         words.add(line.strip())
     return words
 
+#gets all the text with a file as one block of text
+def readFile(filepath):
+    with open(filepath, 'r') as file:
+        filecontent = file.read()
+    return filecontent
 
-def getDocumentName(line):
-    return line[(line.index(">")+1):line.index("<",1)].strip()
-
-def getTag(line):
-    try:
-        if line.index(">") > line.index("<"):
-            return line[(line.index("<")+1): line.index(">")]
-    except ValueError:
-        return 'NA'
+#removes punctuation, digits and words found within stop words parameter
+def removeUnwanted(text,stopwords):
+    numberless = re.sub(r'\d+', '', text) #removes all digits in text with ''
+    lowercase = numberless.lower()
+    hyphensplit = lowercase.replace("'", "")
+    #replaces  all punctuation with a " "
+    nopunctuation = hyphensplit.translate(str.maketrans(string.punctuation, ' '*len(string.punctuation)))
+    rawtokens = nopunctuation.split()
     
-def tokenizeDoc(text,stopwords): # fix tomoorw
-    #modifiedpunctuation = string.punctuation.replace("-","")
-    lowercase = text.lower().replace("-", " ")
-    nopunctuation = lowercase.translate(str.maketrans(string.punctuation, ' '*len(string.punctuation)))
-    unmodifiedtokens = nopunctuation.split()
-    porter = porter_stemmer.PorterStemmer()
-    stemmedtokens=[]
-
-
-    for word in unmodifiedtokens:
-        if word in stopwords or word == "" or not word.isalpha(): # isnumeric will only continue if the word is an  positive integer
+    nonstemmedtokens = []
+    for word in rawtokens:
+        if word in stopwords or not word.isalpha(): 
             continue
-        else: 
-            stemmedword = porter.stem(word, 0,len(word)-1)
-            stemmedtokens.append(stemmedword)
+        else:
+            nonstemmedtokens.append(word)
+        
+    return nonstemmedtokens
+
+#will stem the each word in list tokens and returns a list of the stemmed words
+def stemTokens(tokens):
+    porter = PorterStemmer()
+    stemmedtokens = []
+
+    for word in tokens:
+        stemmedtokens.append(porter.stem(word))
     
-    
-            
     return stemmedtokens
 
-def processFile(filepath,documentdictionary,vocabset,stopwords):
+#processes document text to return the document name and its stemmed tokens
+def processDoc(rawdocumenttext,stopwords):
+    #creates regular expression to get all text between docno tags
+    documentnumberpattern = re.compile(r"<DOCNO>(.*?)</DOCNO>")
+    #finds all text fitting regular expression and puts it into a list
+    documentnumber = documentnumberpattern.findall(rawdocumenttext)
 
-    with open(filepath) as file: #with automatically closes the file/directory
+    documenttextpattern = re.compile(r"<TEXT>(.*?)</TEXT>",re.DOTALL)
+    documenttext = documenttextpattern.findall(rawdocumenttext)
 
-        documentname=""
-        documentrawtext = ""
-        documenttokens=[]
-        textflag = False
+    headlinepattern = re.compile(r"<HEAD>(.*?)</HEAD>",re.DOTALL)
+    headtext = headlinepattern.findall(rawdocumenttext)
 
-        for line in file:
-            tag = getTag(line)
-            match tag:
-                case "DOCNO":
-                    documentname = getDocumentName(line)
-                    continue
-                
-                case "/DOC": 
-                    documenttokens=tokenizeDoc(documentrawtext, stopwords)
-                    documentdictionary.update({documentname: documenttokens.copy()})
-                    vocabset.update(set(documenttokens.copy()))
+    documenttext.extend(headtext) # appends headtext list into documenttext list
+    unstemmedtokens = removeUnwanted(" ".join(documenttext),stopwords)
 
-                    documentname, documentrawtext = "", ""
-                    documenttokens.clear()
-                    continue 
+    stemmedtokens = stemTokens(unstemmedtokens)
 
-                case "TEXT":
-                    textflag = True
-                    continue
-                
-                case "/TEXT":
-                    textflag = False
-                    continue 
+    tokenset = stemmedtokens.copy() 
 
-                case "NA":
-                    if(textflag == True):
-                        documentrawtext += " "+ line.strip()
-                    continue
+    return (documentnumber[0].strip(), stemmedtokens, tokenset)
 
-                case _ :
-                    continue
-                                          
-# a token is a word that is not a common word (like the, a, of...)
-# The tokens in the phrase "The dog is red" are "dog" and "red"
-def processCorpus(documentdictionary,vocabset,stopwords): #documentdictionary being an empty dicitonary 
+#looks through the text of a file to process each doucment text block within the file
+def processFile(filetext,documentdictionary,vocabset,stopwords):
+    #creates regular expression to get all text between doc tags
+    pattern = re.compile(r'<DOC>(.*?)</DOC>',re.DOTALL)
+    #finds all text fitting regular expression and puts it into a list
+    documentcontent = pattern.findall(filetext)
+
+    #iterate through each document and 
+    for document in documentcontent: 
+        resultstuple = processDoc(document,stopwords)
+        #adds the document name and its list of stemmed tokens into a dictionary to be used in indexing
+        documentdictionary.update({resultstuple[0]:resultstuple[1]})
+        #add the stemmed tokens of document into the set of unique tokens of the entire corpus
+        vocabset.update(resultstuple[2])
+    
+#Process each file in corpus to create the vocabulary and a dictionary of all the stemmed tokens of each document
+def processCorpus(documentdictionary,vocabset,stopwords): 
+    #iterate through each file within folder coll
     with os.scandir('coll/') as entries: 
-        
         for entry in entries:
-            processFile(entry,documentdictionary,vocabset,stopwords)
-        
+            filetext = readFile(entry)
+            processFile(filetext,documentdictionary,vocabset,stopwords)
+    return vocabset,documentdictionary
         
 
 
@@ -111,22 +102,4 @@ def processCorpus(documentdictionary,vocabset,stopwords): #documentdictionary be
 
 #main 
 
-'''
-stopwords = getWords("testing_files/stopwords.txt")
-documentdictonary = {}
-vocabset = set()
 
-processFile("testing_files/textdoc.txt",documentdictonary,vocabset)
-print(vocabset)
-
-processCorpus(documentdictonary,vocabset)
-print(len(vocabset))
-file = open("vocab.txt","w")
-for word in vocabset:
-    file.write(word+"\n")
-file.close()
-
-file2 = open("documentbag.json", "w")
-json.dump(documentdictonary, file2)
-file2.close()
-'''

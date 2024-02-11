@@ -1,39 +1,47 @@
 
-'''
- index = hash table <token, list>
-
- Fill up the index with the tokens from preprocessor 
-
- Go through the tokens of individual docs -> add to  tokens list if there exist
-
-store index as a json 
-
-read json to get index as an object 
-'''
-
-import preprocessor
 import json
+from collections import Counter
 
-def initializeIndex(index,vocabset):
+#given a list of words (vocabset) and tokens in each document(documentdictionary)
+#function returns an inverted index of the words in vocabset
+def makeIndex(vocabset,documentdictionary):
+    #dictionary key is a word in the vocabulary
+    #dictionary value is another dictionary that stores the document name and frequency of word in document
+    index = {}
+
+    #dicitonary stores the highest frequency of a term in a document for tf-idf normalization
+    maxfrequency = {}
+
+    #initializes index with empty values
     for token in vocabset: 
         index.update({token:{}}) 
 
-def populateIndex(index,documentdictionary):
-    count = 0
-    for key in documentdictonary.keys(): #iterate through index
-        for token in documentdictionary.get(key): #iterate through bag of words of each doc
-            if token in index: 
-                if key in index.get(token):
-                    index.get(token).update({key: (index.get(token)[key]) + 1})
-                else:
-                    index.get(token).update({key: 1})
-    
+    for document in documentdictionary: 
+        #skip documents that have no text in text tag or head tag
+        if not documentdictionary.get(document):
+            continue
 
+        else:
+            #given all the stemmed tokens of a document(including repeats)
+            #returns a dictionary containing each token and its frequency
+            organizedtokens = Counter(documentdictionary.get(document))
 
-def storeHash(index):
-    with open("invertedindex.json","w") as file:
+            #gets the most frequent and adds it to maxfrequency dicitionary
+            maxfrequency.update({document: organizedtokens.most_common(1)[0][1]})
+
+            for token in organizedtokens:
+                if token in index: 
+                    index.get(token).update({document: organizedtokens[token]})
+
+            
+    return index, maxfrequency
+
+# utility function that stores a dictionary as a json file in directory
+def storeHash(index, name):
+    with open(name,"w") as file:
         json.dump(index, file)
 
+#utility function that reads a json in directory and returns its python object equialent
 def retrieveHash(filename):
     try: 
         index={}
@@ -44,14 +52,3 @@ def retrieveHash(filename):
         print("Index File has not been created yet")
 
 #main
-stopwords = preprocessor.getWords("testing_files/stopwords.txt")
-documentdictonary = retrieveHash("testing_files/documentbag.json")
-vocab = preprocessor.getWords("testing_files/vocab.txt")
-index = {}
-
-# initializeIndex(index,vocab)
-# print("empty index")
-# populateIndex(index,documentdictonary)
-# print("done making index")
-# storeHash(index)
-
