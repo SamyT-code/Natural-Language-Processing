@@ -16,11 +16,16 @@ for potenial reuse
 from sentence_transformers import SentenceTransformer # pip install sentence-transformers
 import multiprocessing
 from multiprocessing import Process,Queue,Manager
+from preprocessor import getWords
+from queries import Query
+from retrieval import runReRankQuery
 import queue # imported for using queue.Empty exception
 from index import retrieveHash, storeHash
 import logging
 import re
 import os
+from heapq import heappop,heappush
+from cosine import printResults
 
 #processes document text to return the document name and combined document text
 def processDoc(rawdocumenttext):
@@ -71,6 +76,8 @@ def processCorpus(documentdictionary):
 
     return documentdictionary
 
+#a consumer process that will encode tuple from a queue and update a dicitonary with 
+#the bert encoded vector 
 def encode(inqueue,dictionary):
     while True:
         try:
@@ -88,6 +95,8 @@ def encode(inqueue,dictionary):
             print(entry[0] + " done")
     return True
 
+#a producer proccess that intializes the queue for the consumers by 
+#reading a dictionary from a json file
 def emdedItems(inputfilename,outputfilename):
     multiprocessing.log_to_stderr(logging.DEBUG)
     inputqueue= Queue()
@@ -106,7 +115,8 @@ def emdedItems(inputfilename,outputfilename):
         p = Process(target=encode, args=(inputqueue, resultsdictionary))
         processes.append(p)
         p.start()
-
+    
+    #wait for all sub processes to exit before continuing 
     for p in processes:
         p.join()
 
@@ -124,7 +134,79 @@ def emdedItems(inputfilename,outputfilename):
     '''
     return True
 
+def getQueryVector(querynumber,mode, dictionary):
+    bertmodel = SentenceTransformer('multi-qa-distilbert-cos-v1')
+    querytext=""
+    match mode:
+        case 0: # title 
+            querytext = dictionary[querynumber].title
+        case 1: # title and description 
+            querytext = dictionary[querynumber].title +" "+ dictionary[querynumber+1].desc
+    
+    queryvector = bertmodel.encode(sentences=[querytext],normalize_embeddings=True)
 
-if __name__ == '__main__':
-    emdedItems('helper/documenttext.json','helper/embedbertdocuments.json')
+    return queryvector
 
+def dotProduct(vector1,vector2):
+    result = 0
+    for x in range(len(vector1)):
+        result += vector1[x]*vector2[x]
+    return result
+
+
+def bertRerank():
+    # intialize needed objects from helper directory for cosine retrieval 
+    queriesdata = Query.read_queries('queries.txt')
+    stopwords = getWords("stopwords.txt")
+    index = retrieveHash("helper/invertedindex.json")
+    maxfrequencydict = retrieveHash("helper/maxfrequency.json")
+
+    #intialize objects for bert
+    documentembeddings = retrieveHash("helper/embedbertdocuments.json")
+
+    #change mode to 0 to query on the queries title
+    #change mode to 1 to query on the queries title and description
+    mode = 0
+
+    rerankeddocs= []
+
+    #gets the top 1000 docs from each query from the assignment 1 system 
+    for query in queriesdata:
+        querydocs =runReRankQuery(queriesdata[query].num, mode, queriesdata, stopwords, index,maxfrequencydict)
+        queryvector = getQueryVector(query,mode, queriesdata)
+        heap = []
+
+        #calcualtes dot product between bert query vector and the bert encoded top 1000 relevant document vectors
+        for relevantdoc in querydocs:
+            documentvector= documentembeddings[relevantdoc]
+            dotproduct = dotProduct(queryvector[0],documentvector)
+            heappush(heap, (dotproduct * -1 , relevantdoc)) # max heap sort 
+
+        topresults = []
+        for _ in range(1000):
+            try:
+                tuple = heappop(heap)
+                #similarity by -1 to reverse the negation when being pushed into the heap
+                correctedtuple = (tuple[0]* -1, tuple[1])
+                topresults.append(correctedtuple)
+            except IndexError:
+                break
+        rerankeddocs.append(topresults)
+    printResults(rerankeddocs,mode)
+
+#main
+bertRerank()
+        
+            
+
+
+
+
+
+
+
+    
+
+
+
+        

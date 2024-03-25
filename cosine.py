@@ -104,4 +104,4 @@ def printResults(results,querytype):
             count = 0
 
 #main
-main()
+#main()
