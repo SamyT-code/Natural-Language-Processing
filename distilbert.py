@@ -97,7 +97,7 @@ def encode(inqueue,dictionary):
 
 #a producer proccess that intializes the queue for the consumers by 
 #reading a dictionary from a json file
-def emdedItems(inputfilename,outputfilename):
+def embedItems(inputfilename,outputfilename):
     multiprocessing.log_to_stderr(logging.DEBUG)
     inputqueue= Queue()
     manager = Manager()
@@ -154,7 +154,7 @@ def dotProduct(vector1,vector2):
     return result
 
 
-def bertRerank():
+def distilBertRerank():
     # intialize needed objects from helper directory for cosine retrieval 
     queriesdata = Query.read_queries('queries.txt')
     stopwords = getWords("stopwords.txt")
@@ -195,7 +195,7 @@ def bertRerank():
     printResults(rerankeddocs,mode)
 
 #main
-bertRerank()
+distilBertRerank()
         
             
 
