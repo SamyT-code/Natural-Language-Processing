@@ -40,7 +40,7 @@ def universalReRank():
 
     #change mode to 0 to query on the queries title
     #change mode to 1 to query on the queries title and description
-    mode = 0
+    mode = 1
 
     rerankeddocs= []
 
