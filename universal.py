@@ -17,7 +17,7 @@ def getQueryVector(querynumber,mode, dictionary):
     return queryvector
 
 def dotProduct(vector1,vector2):
-    #
+    # compute similarity between vectors
     result = 0
     for x in range(len(vector1)):
         result += vector1[x]*vector2[x]
@@ -50,7 +50,7 @@ def universalReRank():
         queryvector = getQueryVector(query,mode, querydict)
         heap = []
 
-        #calcualtes dot product between bert query vector and the bert encoded top 1000 relevant document vectors
+        #calculates dot product between bert query vector and the bert encoded top 1000 relevant document vectors
         for relevantdoc in querydocs:
             documentvector= documentembeddings[relevantdoc][0]
             dotproduct = dotProduct(queryvector,documentvector)
