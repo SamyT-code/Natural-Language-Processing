@@ -9,7 +9,7 @@ import math
 def runQuery(querynumber, querytype, querylist, stopwords, index,maxfrequencydict):
     queryvector, querytokens= prepareQueryVector(querynumber, querytype,querylist, stopwords, index)
     potentialdocuments = getPotentialDocuments(querytokens,index)
-    topresults = getRankedDocuments(queryvector,potentialdocuments,querytokens,index,maxfrequencydict)
+    topresults = getReRankedDocuments(queryvector,potentialdocuments,querytokens,index,maxfrequencydict)
     return topresults
 
 def getDocumentFrequency(token, index):
@@ -17,7 +17,13 @@ def getDocumentFrequency(token, index):
         return (len(index.get(token)))
     else:
         return 0 # catches the case where df = 0
-
+    
+ #modified runQuery that returns calls getReRankedDocuments
+def runReRankQuery(querynumber, querytype, querylist, stopwords, index,maxfrequencydict):
+    queryvector, querytokens= prepareQueryVector(querynumber, querytype,querylist, stopwords, index)
+    potentialdocuments = getPotentialDocuments(querytokens,index)
+    topresults = getReRankedDocuments(queryvector,potentialdocuments,querytokens,index,maxfrequencydict)
+    return topresults
 
 def getInvertedDocumentFrequency(token,index): 
     #we add 1 to document frequency to avoid dividing by zero 
@@ -131,6 +137,26 @@ def getRankedDocuments(queryvector,potentialdocuments,querytokens,index,maxfrequ
             break
     return topresults
 
+#modified getRankedDocuments, only returns a list of doc names of the top 1000 relevant docs
+def getReRankedDocuments(queryvector,potentialdocuments,querytokens,index,maxfrequencydict):
+    #use a max heap to sort the cosine similarty
+    heap=[]
+    for document in potentialdocuments:
+        documentvector = makeDocumentVector(querytokens,document,index,maxfrequencydict)
+        similairty = getCosineSimilarity(queryvector,documentvector,querytokens)
+        #multiply similarity by -1 as heapq implements a min heap 
+        heappush(heap, (similairty * -1 , document))
+    
+    topresults = []
+    for _ in range(1000):
+        try:
+            tuple = heappop(heap)
+            #similarity by -1 to reverse the negation when being pushed into the heap
+            correctedtuple = tuple[1]
+            topresults.append(correctedtuple)
+        except IndexError:
+            break
+    return topresults
 
 #main
 
