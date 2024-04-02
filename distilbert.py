@@ -141,7 +141,7 @@ def getQueryVector(querynumber,mode, dictionary):
         case 0: # title 
             querytext = dictionary[querynumber].title
         case 1: # title and description 
-            querytext = dictionary[querynumber].title +" "+ dictionary[querynumber+1].desc
+            querytext = dictionary[querynumber].title +" "+ dictionary[querynumber].desc
     
     queryvector = bertmodel.encode(sentences=[querytext],normalize_embeddings=True)
 
