@@ -30,7 +30,7 @@ python main.py
 
 To change the mode of testing the queries (titles only or titles + description), change the value of `mode` in `main.py`: `0` --> query on titles, `1` --> query on title + description
 
-Currently `main.py` will load in the invertedindex.json file to do help with retrieval. If you would like the index to be remade, delete all files in the hleper folder and run the `python main.py` within a Terminal/Command Prompt within the assignment folder. This will take significantly longer.
+Currently `main.py` will load in the `invertedindex.json` file to do help with retrieval. If you would like the index to be remade, delete all files in the helper folder and run the `python main.py` within a Terminal/Command Prompt within the assignment folder. This will take significantly longer.
 
 ## Program Functionalities
 ---
