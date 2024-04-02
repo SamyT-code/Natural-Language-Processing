@@ -11,7 +11,7 @@ Following these steps below will guide you to setting up the project and running
 
 #### Installing Packages
 ---
-The library used to provide support for preprocessing of documents and queries is NLTK. Specifically, the stemming package of NLTK is used to lowers inflection in words to their root forms, hence aiding in the preprocessing of text, words, and documents for text normalization. TO install this package, run the following command (after installation of Python):
+The library used to provide support for preprocessing of documents and queries is `nltk`. Specifically, the stemming package of NLTK is used to lowers inflection in words to their root forms, hence aiding in the preprocessing of text, words, and documents for text normalization. To install this package, run the following command (after installation of Python):
 ```bash
 pip install nltk
 ```
