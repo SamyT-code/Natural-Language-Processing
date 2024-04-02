@@ -155,7 +155,7 @@ def dotProduct(vector1,vector2):
 
 
 def distilBertRerank():
-    # intialize needed objects from helper directory for cosine retrieval 
+    #intialize needed objects from helper directory for cosine retrieval 
     queriesdata = Query.read_queries('queries.txt')
     stopwords = getWords("stopwords.txt")
     index = retrieveHash("helper/invertedindex.json")
@@ -176,7 +176,7 @@ def distilBertRerank():
         queryvector = getQueryVector(query,mode, queriesdata)
         heap = []
 
-        #calcualtes dot product between bert query vector and the bert encoded top 1000 relevant document vectors
+        #calculates dot product between bert query vector and the bert encoded top 1000 relevant document vectors
         for relevantdoc in querydocs:
             documentvector= documentembeddings[relevantdoc]
             dotproduct = dotProduct(queryvector[0],documentvector)
