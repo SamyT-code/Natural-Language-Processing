@@ -23,7 +23,7 @@ py -3 -m pip install nltk
 
 #### Program Execution
 ---
-To execute the program, download the assignment zip folder, unzip the folder and open the unzipped file where ever you unzipped it. Open a Terminal (on Linux or Mac) ot Command Prompt (windows) within the unzipped assignment folder. Run the following command (can use `py` or `python` as the launcher option) in Terminal/Command Prompt:
+To execute the program, download the assignment zip folder, unzip the folder and open the unzipped file where ever you unzipped it. Open a Terminal (on Linux or Mac) or Command Prompt (Windows) within the unzipped assignment folder. Run the following command (can use `py` or `python` as the launcher option) in Terminal/Command Prompt:
 ```bash
 python main.py
 ```
