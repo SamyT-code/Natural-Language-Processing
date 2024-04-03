@@ -196,17 +196,3 @@ def distilBertRerank():
 
 #main
 distilBertRerank()
-        
-            
-
-
-
-
-
-
-
-    
-
-
-
-        

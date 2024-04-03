@@ -69,5 +69,3 @@ def universalReRank():
     printResults(rerankeddocs,mode)
     
 universalReRank()
-
-
