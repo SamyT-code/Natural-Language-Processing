@@ -37,7 +37,7 @@ def makeQueryVector(tokens,index):
     for token in organizedtokens:
         #double normalization of term frequency
         tf = 0.5+ (0.5 *(organizedtokens[token])/maxfrequency)
-        idf =getInvertedDocumentFrequency(token,index)
+        idf = getInvertedDocumentFrequency(token,index)
         organizedtokens[token] = tf*idf
     
     return organizedtokens
