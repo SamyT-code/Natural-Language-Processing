@@ -99,7 +99,7 @@ def encode(inqueue,dictionary):
 #reading a dictionary from a json file
 def embedItems(inputfilename,outputfilename):
     multiprocessing.log_to_stderr(logging.DEBUG)
-    inputqueue= Queue()
+    inputqueue = Queue()
     manager = Manager()
     resultsdictionary = manager.dict()
 
@@ -110,7 +110,7 @@ def embedItems(inputfilename,outputfilename):
         inputqueue.put((x, data[x]))
     
     
-    # creating processes
+    #creating processes
     for w in range(multiprocessing.cpu_count()):
         p = Process(target=encode, args=(inputqueue, resultsdictionary))
         processes.append(p)
@@ -136,7 +136,7 @@ def embedItems(inputfilename,outputfilename):
 
 def getQueryVector(querynumber,mode, dictionary):
     bertmodel = SentenceTransformer('multi-qa-distilbert-cos-v1')
-    querytext=""
+    querytext = ""
     match mode:
         case 0: # title 
             querytext = dictionary[querynumber].title
@@ -164,9 +164,9 @@ def distilBertRerank():
     #intialize objects for bert
     documentembeddings = retrieveHash("helper/embedbertdocuments.json")
 
-    #change mode to 0 to query on the queries title | Map: 0.2883
-    #change mode to 1 to query on the queries title and description | Map: 0.2897
-    mode = 1
+    #change mode to 0 to query on the queries title
+    #change mode to 1 to query on the queries title and description
+    mode = 0
 
     rerankeddocs= []
 
@@ -196,17 +196,3 @@ def distilBertRerank():
 
 #main
 distilBertRerank()
-        
-            
-
-
-
-
-
-
-
-    
-
-
-
-        
