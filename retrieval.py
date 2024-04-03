@@ -55,7 +55,7 @@ def makeDocumentVector(tokens,document,index,maxfrequencydict):
             if index.get(token).get(document) != None:
                  #double normalization of term frequency
                 tf = 0.5 + (0.5 * (index.get(token).get(document))/ maxfrequency)
-        idf =getInvertedDocumentFrequency(token,index)
+        idf = getInvertedDocumentFrequency(token,index)
         organizedtokens[token] = tf * idf
     
     return organizedtokens

@@ -17,7 +17,7 @@ def getQueryVector(querynumber,mode, dictionary):
     return queryvector
 
 def dotProduct(vector1,vector2):
-    # compute similarity between vectors
+    #compute similarity between vectors
     result = 0
     for x in range(len(vector1)):
         result += vector1[x]*vector2[x]
@@ -25,7 +25,7 @@ def dotProduct(vector1,vector2):
 
 
 def universalReRank():
-    # intialize needed objects from helper directory for cosine retrieval 
+    #intialize needed objects from helper directory for cosine retrieval 
     queriesdata = Query.read_queries('queries.txt')
     stopwords = getWords("stopwords.txt")
     index = retrieveHash("helper/invertedindex.json")
