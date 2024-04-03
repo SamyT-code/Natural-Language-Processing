@@ -164,9 +164,9 @@ def distilBertRerank():
     #intialize objects for bert
     documentembeddings = retrieveHash("helper/embedbertdocuments.json")
 
-    #change mode to 0 to query on the queries title
-    #change mode to 1 to query on the queries title and description
-    mode = 0
+    #change mode to 0 to query on the queries title | Map: 0.2883
+    #change mode to 1 to query on the queries title and description | Map: 0.2897
+    mode = 1
 
     rerankeddocs= []
 

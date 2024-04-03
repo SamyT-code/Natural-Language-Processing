@@ -38,8 +38,8 @@ def universalReRank():
     '''
     documentembeddings = retrieveHash("helper/universaldocuments.json")
 
-    #change mode to 0 to query on the queries title
-    #change mode to 1 to query on the queries title and description
+    #change mode to 0 to query on the queries title | Map: 0.2478
+    #change mode to 1 to query on the queries title and description | Map: 0.2728
     mode = 1
 
     rerankeddocs= []
