@@ -1,7 +1,7 @@
 ## Introduction
 | Name | Assigned Tasks | Student Number |
 | ---- | ---- | ---- |
-| Samy Touabi | **Preprocessing**, Project Initialization Topic querying, Report | 300184721 |
+| Samy Touabi | **Preprocessing**, Project Initialization, Topic querying, Report | 300184721 |
 | Jackie Chen | **Retrieval and Ranking**, Fine-Tuning of Results, Report | 300165909 |
 | Kian Zahrai | **Indexing**, Initialized Indexing, Query Processing, Report | 300098986 |
 The assignment involves implementing an Information Retrieval (IR) system based on the vector space model for a collection of documents. Key steps include preprocessing (tokenization, stop word removal, stemming), indexing (creating an inverted index), and retrieval and ranking (calculating document-query similarity). In this document, the project is detailed by implementation, methodology, evaluation (using provided queries and relevance judgments), and any observations or conclusions drawn from the process, providing a design to apply theoretical concepts of IR in a practical setting, enhancing understanding of search engine mechanisms.
